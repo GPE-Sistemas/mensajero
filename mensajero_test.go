@@ -1,6 +1,7 @@
 package mensajero
 
 import (
+	"maps"
 	"slices"
 	"strings"
 	"testing"
@@ -30,6 +31,17 @@ func TestPlantillasReales(t *testing.T) {
 			if r.Asunto == "" || !strings.Contains(r.HTML, "<html") || r.Texto == "" {
 				t.Fatalf("renderizado incompleto: %+v", r)
 			}
+			// Verificar que todos los valores de datos aparecen en el texto plano
+			for k, v := range datos {
+				if !strings.Contains(r.Texto, v) {
+					t.Errorf("el texto no muestra %s=%q", k, v)
+				}
+			}
+			// Verificar que los campos de la plantilla coinciden con las claves de datos
+			gotCampos := slices.Sorted(maps.Keys(datos))
+			if !slices.Equal(p.Campos, gotCampos) {
+				t.Errorf("plantilla campos = %v, esperaba %v", p.Campos, gotCampos)
+			}
 		})
 	}
 	if !slices.Equal(got, want) {
@@ -46,7 +58,10 @@ func TestSistemasReal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	cat, _ := plantillas.Cargar(Archivos, "plantillas")
+	cat, err := plantillas.Cargar(Archivos, "plantillas")
+	if err != nil {
+		t.Fatal(err)
+	}
 	for _, p := range cat.Todas() {
 		if _, ok := sis[p.Sistema]; !ok {
 			t.Errorf("hay plantillas de %q pero no está en sistemas.json", p.Sistema)
