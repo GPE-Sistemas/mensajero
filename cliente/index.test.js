@@ -37,9 +37,12 @@ test('un error del servidor llega con su status y mensaje', async (t) => {
   await assert.rejects(m.enviar('x', { para: 'a@x.com', datos: {} }), (e) => e instanceof MensajeroError && e.status === 400 && e.message === 'falta "link"');
 });
 
-test('si no llega al mensajero, status 0', async () => {
-  const m = new Mensajero({ url: 'http://127.0.0.1:1', apikey: 'k', timeoutMs: 2000 });
-  await assert.rejects(m.enviar('x', { para: 'a@x.com', datos: {} }), (e) => e instanceof MensajeroError && e.status === 0);
+test('si no llega al mensajero, status 0 con la causa', async () => {
+  const s = await servidor(() => {});
+  const puerto = s.address().port;
+  await new Promise((r) => s.close(r)); // puerto cerrado: connection refused
+  const m = new Mensajero({ url: `http://127.0.0.1:${puerto}`, apikey: 'k', timeoutMs: 2000 });
+  await assert.rejects(m.enviar('x', { para: 'a@x.com', datos: {} }), (e) => e instanceof MensajeroError && e.status === 0 && e.message.includes('ECONNREFUSED'));
 });
 
 async function rechazaCon(t, responder, status, opciones = {}) {

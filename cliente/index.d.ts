@@ -12,7 +12,7 @@ export interface OpcionesEnvio<S extends Sistema, D> {
   responderA?: string;
 }
 
-/** status 0: no se llegó al mensajero. 502: Postfix no respondió. En esos dos tiene sentido reintentar. */
+/** status 0: no se llegó al mensajero. 502: Postfix no respondió. En esos dos tiene sentido reintentar. 500: la plantilla falló (error del mensajero, no del pedido). */
 export declare class MensajeroError extends Error {
   readonly status: number;
 }

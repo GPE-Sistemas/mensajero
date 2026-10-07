@@ -18,12 +18,12 @@ await mail.enviar('reset-password', { para: usuario.email, datos: { link } });
 ```
 
 `MensajeroError.status`: 400 (pedido mal armado), 401 (apikey), 403 (remitente), 429 (tope por
-destinatario), 502 (Postfix no respondió: se puede reintentar), 0 (no se llegó al mensajero).
+destinatario), 500 (la plantilla falló: error del mensajero, no del pedido), 502 (Postfix no respondió: se puede reintentar), 0 (no se llegó al mensajero).
 
 ## Agregar o cambiar una plantilla
 
 1. `plantillas/<sistema>/<nombre>/`: `asunto.txt`, `cuerpo.html` (`{{define "contenido"}}...{{end}}`),
-   `cuerpo.txt` (opcional) y `ejemplo.json` con exactamente los campos que usa.
+   `cuerpo.txt` y `ejemplo.json` con exactamente los campos que usa.
 2. Sólo `{{.campo}}` de primer nivel e `{{if}}`. Los datos son strings y se escapan solos.
 3. `make vista-previa P=<sistema>/<nombre>` para verla.
 4. `make generar` para regenerar los tipos del cliente, y `make test`.

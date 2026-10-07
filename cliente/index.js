@@ -28,7 +28,7 @@ class Mensajero {
       });
       texto = await res.text(); // el timeout también cubre la lectura del cuerpo
     } catch (err) {
-      throw new MensajeroError(0, `no se pudo llegar al mensajero: ${err.message}`);
+      throw new MensajeroError(0, `no se pudo llegar al mensajero: ${err.message}${err.cause?.code ? ` (${err.cause.code})` : ''}`);
     }
     let cuerpo;
     try {
