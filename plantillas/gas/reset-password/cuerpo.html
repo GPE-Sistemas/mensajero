@@ -1,0 +1,7 @@
+{{define "contenido"}}
+<h1 style="margin:0 0 16px;font-size:20px;">Restablecé tu contraseña</h1>
+<p style="margin:0 0 16px;">Recibimos un pedido para cambiar la contraseña de tu cuenta. Para elegir una nueva, usá este botón:</p>
+<p style="margin:24px 0;"><a href="{{.link}}" style="display:inline-block;background:#0f766e;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:bold;">Elegir contraseña nueva</a></p>
+<p style="margin:0 0 16px;">El enlace vence en 10 minutos. Si no pediste el cambio, ignorá este mensaje: tu contraseña sigue siendo la misma.</p>
+<p style="margin:0;font-size:13px;color:#6b7280;">Si el botón no funciona, copiá este enlace en el navegador:<br><a href="{{.link}}" style="color:#0f766e;word-break:break-all;">{{.link}}</a></p>
+{{end}}

@@ -1,0 +1,1 @@
+Normalizado: {{.variable}} en {{.punto}}

@@ -1,0 +1,11 @@
+Ya tenés usuario en INSIDE Horatech
+
+Usuario: {{.usuario}}
+Contraseña: {{.password}}
+
+Entrá en {{.link}}
+
+Te recomendamos cambiar la contraseña la primera vez que entres.
+
+--
+INSIDE Horatech · Mensaje automático, no lo respondas.

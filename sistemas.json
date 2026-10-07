@@ -1,0 +1,8 @@
+{
+  "gas": {
+    "remitentes": {
+      "default": "no-reply@horatech.ar",
+      "alertas": "alertas@horatech.ar"
+    }
+  }
+}
