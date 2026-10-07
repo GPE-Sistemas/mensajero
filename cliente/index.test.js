@@ -41,3 +41,17 @@ test('si no llega al mensajero, status 0', async () => {
   const m = new Mensajero({ url: 'http://127.0.0.1:1', apikey: 'k', timeoutMs: 2000 });
   await assert.rejects(m.enviar('x', { para: 'a@x.com', datos: {} }), (e) => e instanceof MensajeroError && e.status === 0);
 });
+
+async function rechazaCon(t, responder, status, opciones = {}) {
+  const s = await servidor(responder);
+  t.after(() => { s.closeAllConnections(); s.close(); });
+  const m = new Mensajero({ url: `http://127.0.0.1:${s.address().port}`, apikey: 'k', ...opciones });
+  await assert.rejects(m.enviar('x', { para: 'a@x.com', datos: {} }), (e) => e instanceof MensajeroError && e.status === status);
+}
+
+test('200 con cuerpo que no es JSON es error', (t) => rechazaCon(t, (_r, _c, res) => res.writeHead(200).end('<html>proxy</html>'), 200));
+test('200 sin id es error', (t) => rechazaCon(t, (_r, _c, res) => res.writeHead(200).end('{}'), 200));
+test('500 con cuerpo que no es JSON conserva el status', (t) => rechazaCon(t, (_r, _c, res) => res.writeHead(500).end('boom'), 500));
+test('error con cuerpo null conserva el status', (t) => rechazaCon(t, (_r, _c, res) => res.writeHead(502).end('null'), 502));
+test('timeout leyendo el cuerpo es status 0', (t) =>
+  rechazaCon(t, (_r, _c, res) => res.writeHead(200, { 'Content-Type': 'application/json' }).write('{"id":'), 0, { timeoutMs: 300 }));

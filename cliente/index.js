@@ -18,6 +18,7 @@ class Mensajero {
 
   async enviar(plantilla, { para, datos, remitente, nombre, responderA }) {
     let res;
+    let texto;
     try {
       res = await fetch(`${this.url}/v1/email`, {
         method: 'POST',
@@ -25,12 +26,22 @@ class Mensajero {
         body: JSON.stringify({ plantilla, para, datos, remitente, nombre, responderA }),
         signal: AbortSignal.timeout(this.timeoutMs),
       });
+      texto = await res.text(); // el timeout también cubre la lectura del cuerpo
     } catch (err) {
       throw new MensajeroError(0, `no se pudo llegar al mensajero: ${err.message}`);
     }
-    const cuerpo = await res.json().catch(() => ({}));
+    let cuerpo;
+    try {
+      cuerpo = JSON.parse(texto);
+    } catch {
+      cuerpo = undefined;
+    }
     if (!res.ok) {
-      throw new MensajeroError(res.status, cuerpo.error || res.statusText);
+      const error = cuerpo?.error;
+      throw new MensajeroError(res.status, typeof error === 'string' && error ? error : res.statusText || 'error del mensajero');
+    }
+    if (typeof cuerpo?.id !== 'string') {
+      throw new MensajeroError(res.status, 'respuesta inválida del mensajero');
     }
     return { id: cuerpo.id };
   }
