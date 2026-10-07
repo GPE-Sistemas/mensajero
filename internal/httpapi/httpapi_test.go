@@ -166,3 +166,36 @@ func TestSalud(t *testing.T) {
 		t.Fatal(w.Code)
 	}
 }
+
+func TestEnvioFallidoNoConsumeTope(t *testing.T) {
+	e := nuevo(t)
+	e.smtp.Rechazar(true)
+	for i := 0; i < 2; i++ {
+		if w := e.pedir("clave-gas", ok); w.Code != 502 {
+			t.Fatalf("envío %d: %d %s", i+1, w.Code, w.Body)
+		}
+	}
+	e.smtp.Rechazar(false)
+	if w := e.pedir("clave-gas", ok); w.Code != 200 {
+		t.Fatalf("tras el fallo: %d %s", w.Code, w.Body)
+	}
+}
+
+func TestDireccionConEspacios(t *testing.T) {
+	e := nuevo(t)
+	w := e.pedir("clave-gas", `{"plantilla":"reset","para":" a@x.com ","datos":{"link":"l"}}`)
+	if w.Code != 200 {
+		t.Fatalf("%d %s", w.Code, w.Body)
+	}
+	if r := e.smtp.Recibidos(); len(r) != 1 || len(r[0].Para) != 1 || r[0].Para[0] != "a@x.com" {
+		t.Fatalf("recibidos = %+v", r)
+	}
+}
+
+func TestDireccionNoASCII(t *testing.T) {
+	e := nuevo(t)
+	w := e.pedir("clave-gas", `{"plantilla":"reset","para":"josé@x.com","datos":{"link":"l"}}`)
+	if w.Code != 400 {
+		t.Fatalf("%d %s", w.Code, w.Body)
+	}
+}

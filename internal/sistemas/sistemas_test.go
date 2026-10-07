@@ -63,3 +63,12 @@ func TestClaves(t *testing.T) {
 		}
 	}
 }
+
+func TestClavesRechazaHashRepetido(t *testing.T) {
+	h := sha256.Sum256([]byte("misma"))
+	x := hex.EncodeToString(h[:])
+	_, err := CargarClaves(`{"gas":"` + x + `","acceso":"` + x + `"}`)
+	if err == nil || !strings.Contains(err.Error(), "gas") || !strings.Contains(err.Error(), "acceso") {
+		t.Fatalf("err = %v", err)
+	}
+}

@@ -23,6 +23,16 @@ func Nuevo(max int, ventana time.Duration) *Limite {
 	return &Limite{max: max, ventana: ventana, ahora: time.Now, envios: map[string][]time.Time{}}
 }
 
+// Devolver quita el envío más reciente a destinatario: para cuando el envío falló y no tiene que gastar cupo.
+func (l *Limite) Devolver(destinatario string) {
+	destinatario = strings.ToLower(destinatario)
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if e := l.envios[destinatario]; len(e) > 0 {
+		l.envios[destinatario] = e[:len(e)-1]
+	}
+}
+
 // Permitir registra un envío a destinatario si no pasa el tope dentro de la ventana.
 // Los rechazados no cuentan.
 func (l *Limite) Permitir(destinatario string) bool {

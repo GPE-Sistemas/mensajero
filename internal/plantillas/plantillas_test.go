@@ -163,3 +163,29 @@ func TestCuerpoNoReemplazaBase(t *testing.T) {
 		t.Fatalf("HTML = %q, err = %v", r.HTML, err)
 	}
 }
+
+func TestAsuntoLargo(t *testing.T) {
+	f := fsPrueba()
+	f["p/gas/hola/asunto.txt"] = &fstest.MapFile{Data: []byte("{{.nombre}}")}
+	c, err := Cargar(f, "p")
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, _ := c.Buscar("gas", "hola")
+	datos := map[string]string{"nombre": strings.Repeat("é", 201), "link": "l", "firma": "f"}
+	if _, err := p.Renderizar(datos); !errors.Is(err, ErrDatos) {
+		t.Fatalf("201 runas: %v", err)
+	}
+	datos["nombre"] = strings.Repeat("é", 200)
+	if _, err := p.Renderizar(datos); err != nil {
+		t.Fatalf("200 runas: %v", err)
+	}
+}
+
+func TestCuerpoNoRedefineBase(t *testing.T) {
+	f := fsPrueba()
+	f["p/gas/hola/cuerpo.html"] = &fstest.MapFile{Data: []byte(`{{define "base"}}x{{end}}{{define "contenido"}}y{{end}}`)}
+	if _, err := Cargar(f, "p"); err == nil {
+		t.Fatal("cargó")
+	}
+}

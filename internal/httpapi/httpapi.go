@@ -107,6 +107,7 @@ func (s *Servidor) email(w http.ResponseWriter, r *http.Request) {
 		Texto:      ren.Texto,
 	})
 	if err != nil {
+		s.Limite.Devolver(para) // un envío que no salió no gasta cupo
 		s.rechazar(w, http.StatusBadGateway, sistema, p.Plantilla, para, err.Error())
 		return
 	}
@@ -128,6 +129,12 @@ func responder(w http.ResponseWriter, codigo int, cuerpo any) {
 
 // direccion acepta sólo una dirección sola, sin nombre ni nada alrededor.
 func direccion(s string) (string, error) {
+	s = strings.TrimSpace(s)
+	for i := 0; i < len(s); i++ {
+		if s[i] >= 0x80 {
+			return "", errors.New("sólo se aceptan direcciones ASCII")
+		}
+	}
 	a, err := mail.ParseAddress(s)
 	if err != nil {
 		return "", err

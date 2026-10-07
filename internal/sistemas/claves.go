@@ -22,12 +22,19 @@ func CargarClaves(j string) (Claves, error) {
 		return nil, errors.New("CLAVES: no hay ninguna")
 	}
 	c := Claves{}
+	dueño := map[[32]byte]string{}
 	for s, h := range m {
 		b, err := hex.DecodeString(h)
 		if err != nil || len(b) != sha256.Size {
 			return nil, fmt.Errorf("CLAVES: el hash de %q no es un SHA-256 en hex", s)
 		}
-		c[s] = [32]byte(b)
+		k := [32]byte(b)
+		if otro, ok := dueño[k]; ok {
+			a, z := min(s, otro), max(s, otro)
+			return nil, fmt.Errorf("CLAVES: %q y %q tienen el mismo hash", a, z)
+		}
+		dueño[k] = s
+		c[s] = k
 	}
 	return c, nil
 }

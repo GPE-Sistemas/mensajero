@@ -14,6 +14,7 @@ import (
 	"strings"
 	ttemplate "text/template"
 	"text/template/parse"
+	"unicode/utf8"
 )
 
 // ErrDatos indica que los datos no coinciden con lo que pide la plantilla.
@@ -91,6 +92,14 @@ func cargarPlantilla(fsys fs.FS, dir, base string) (*Plantilla, error) {
 	p := &Plantilla{}
 	if p.asunto, err = ttemplate.New("asunto").Option("missingkey=error").Parse(strings.TrimSpace(asunto)); err != nil {
 		return nil, err
+	}
+	// cuerpo.html no puede redefinir "base": reemplazaría el marco en silencio.
+	aparte, err := htemplate.New("cuerpo").Parse(cuerpo)
+	if err != nil {
+		return nil, err
+	}
+	if aparte.Lookup("base") != nil {
+		return nil, errors.New(`cuerpo.html no puede definir "base"`)
 	}
 	if p.html, err = htemplate.New("base").Option("missingkey=error").Parse(base); err != nil {
 		return nil, err
@@ -234,6 +243,9 @@ func (p *Plantilla) Renderizar(datos map[string]string) (Renderizado, error) {
 	a := strings.TrimSpace(asunto.String())
 	if strings.ContainsAny(a, "\r\n") {
 		return Renderizado{}, fmt.Errorf("%w: el asunto queda con saltos de línea", ErrDatos)
+	}
+	if utf8.RuneCountInString(a) > 200 {
+		return Renderizado{}, fmt.Errorf("%w: el asunto supera 200 caracteres", ErrDatos)
 	}
 	if err := p.html.ExecuteTemplate(&html, "base", datos); err != nil {
 		return Renderizado{}, err
