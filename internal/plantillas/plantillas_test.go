@@ -126,3 +126,40 @@ func TestEjemplo(t *testing.T) {
 		t.Fatalf("d = %v, err = %v", d, err)
 	}
 }
+
+func TestCargarRechazaConstrucciones(t *testing.T) {
+	for _, accion := range []string{`{{$.a.b}}`, `{{$.x}}`, `{{(.a).b}}`, `{{.}}`, `{{index . "x"}}`} {
+		f := fsPrueba()
+		f["p/gas/hola/cuerpo.html"] = &fstest.MapFile{Data: []byte(`{{define "contenido"}}` + accion + `{{end}}`)}
+		if _, err := Cargar(f, "p"); err == nil {
+			t.Errorf("%s: cargó", accion)
+		}
+	}
+}
+
+func TestElseIfCampos(t *testing.T) {
+	f := fsPrueba()
+	f["p/gas/hola/cuerpo.html"] = &fstest.MapFile{Data: []byte(`{{define "contenido"}}{{if .a}}x{{else if .b}}y{{end}}{{end}}`)}
+	c, err := Cargar(f, "p")
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, _ := c.Buscar("gas", "hola")
+	if !slices.Contains(p.Campos, "a") || !slices.Contains(p.Campos, "b") || !slices.Contains(p.Campos, "firma") {
+		t.Fatalf("Campos = %v", p.Campos)
+	}
+}
+
+func TestCuerpoNoReemplazaBase(t *testing.T) {
+	f := fsPrueba()
+	f["p/gas/hola/cuerpo.html"] = &fstest.MapFile{Data: []byte("texto suelto\n{{define \"contenido\"}}<p>{{.nombre}}</p>{{end}}")}
+	c, err := Cargar(f, "p")
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, _ := c.Buscar("gas", "hola")
+	r, err := p.Renderizar(map[string]string{"nombre": "A", "firma": "G"})
+	if err != nil || !strings.Contains(r.HTML, "<footer>") {
+		t.Fatalf("HTML = %q, err = %v", r.HTML, err)
+	}
+}

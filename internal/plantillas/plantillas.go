@@ -95,7 +95,7 @@ func cargarPlantilla(fsys fs.FS, dir, base string) (*Plantilla, error) {
 	if p.html, err = htemplate.New("base").Option("missingkey=error").Parse(base); err != nil {
 		return nil, err
 	}
-	if _, err = p.html.Parse(cuerpo); err != nil {
+	if _, err = p.html.New("cuerpo").Parse(cuerpo); err != nil {
 		return nil, err
 	}
 	texto, err := leer("cuerpo.txt")
@@ -177,11 +177,21 @@ func juntarCampos(n parse.Node, campos map[string]bool) error {
 			}
 		}
 	case *parse.TemplateNode:
+		// {{template "x" .}} pasa todos los datos tal cual: es el único uso permitido de {{.}}.
+		if n.Pipe != nil && len(n.Pipe.Cmds) == 1 && len(n.Pipe.Cmds[0].Args) == 1 {
+			if _, ok := n.Pipe.Cmds[0].Args[0].(*parse.DotNode); ok {
+				return nil
+			}
+		}
 		return juntarCampos(n.Pipe, campos)
 	case *parse.RangeNode:
 		return errors.New("range no soportado: los datos son strings")
 	case *parse.WithNode:
 		return errors.New("with no soportado")
+	case *parse.TextNode, *parse.CommentNode, *parse.IdentifierNode,
+		*parse.StringNode, *parse.NumberNode, *parse.BoolNode:
+	default:
+		return fmt.Errorf("construcción no soportada: %s", n)
 	}
 	return nil
 }
