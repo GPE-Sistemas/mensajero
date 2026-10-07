@@ -1,0 +1,12 @@
+Valor fuera de límite
+
+Punto: {{.punto}}
+Variable: {{.variable}}
+Valor: {{.valor}}
+Límite: {{.limite}}: {{.valorLimite}}
+Fecha: {{.fecha}}
+
+Vas a recibir otro aviso cuando el valor vuelva a la normalidad.
+
+--
+INSIDE Horatech · Mensaje automático, no lo respondas.

@@ -1,0 +1,1 @@
+Alerta: {{.variable}} fuera de límite en {{.punto}}

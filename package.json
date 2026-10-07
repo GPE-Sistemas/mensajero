@@ -1,0 +1,10 @@
+{
+  "name": "mensajero",
+  "version": "1.0.0",
+  "description": "Cliente del mensajero de email de GPE",
+  "main": "cliente/index.js",
+  "types": "cliente/index.d.ts",
+  "files": ["cliente/index.js", "cliente/index.d.ts", "cliente/plantillas.d.ts"],
+  "engines": { "node": ">=18" },
+  "repository": "https://github.com/GPE-Sistemas/mensajero"
+}

@@ -1,0 +1,9 @@
+Valor normalizado
+
+Punto: {{.punto}}
+Variable: {{.variable}}
+Valor: {{.valor}}
+Fecha: {{.fecha}}
+
+--
+INSIDE Horatech · Mensaje automático, no lo respondas.

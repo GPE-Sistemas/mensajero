@@ -1,0 +1,12 @@
+Tu contraseña cambió
+
+Un administrador cambió la contraseña de tu usuario. La nueva es:
+
+{{.codigo}}
+
+Entrá en {{.link}}
+
+Si no esperabas este cambio, avisale al administrador de tu cuenta.
+
+--
+INSIDE Horatech · Mensaje automático, no lo respondas.

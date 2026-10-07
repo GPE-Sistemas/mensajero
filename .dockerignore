@@ -1,0 +1,7 @@
+.git
+cliente/index.js
+cliente/index.d.ts
+cliente/index.test.js
+cliente/prueba-tipos.ts
+node_modules
+.superpowers

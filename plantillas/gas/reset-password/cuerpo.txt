@@ -1,0 +1,10 @@
+Restablecé tu contraseña
+
+Recibimos un pedido para cambiar la contraseña de tu cuenta. Para elegir una nueva, entrá a:
+
+{{.link}}
+
+El enlace vence en 10 minutos. Si no pediste el cambio, ignorá este mensaje: tu contraseña sigue siendo la misma.
+
+--
+INSIDE Horatech · Mensaje automático, no lo respondas.
