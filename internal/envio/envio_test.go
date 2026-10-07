@@ -131,3 +131,34 @@ func TestEnviarSinServidor(t *testing.T) {
 		t.Fatalf("err = %v en %v", err, time.Since(inicio))
 	}
 }
+
+func TestEnviarServidorMudo(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var conns []net.Conn
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for {
+			c, err := ln.Accept()
+			if err != nil {
+				return
+			}
+			conns = append(conns, c) // acepta y no escribe nada
+		}
+	}()
+	t.Cleanup(func() {
+		ln.Close()
+		<-done
+		for _, c := range conns {
+			c.Close()
+		}
+	})
+	inicio := time.Now()
+	_, err = SMTP{Addr: ln.Addr().String(), Timeout: 300 * time.Millisecond}.Enviar(context.Background(), mensaje())
+	if !errors.Is(err, ErrSMTP) || time.Since(inicio) > 2*time.Second {
+		t.Fatalf("err = %v en %v", err, time.Since(inicio))
+	}
+}
