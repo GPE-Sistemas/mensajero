@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Formato
+        run: test -z "$(gofmt -l .)"
+      - name: Vet
+        run: go vet ./...
+      - name: Test (incluye que el cliente generado esté al día)
+        run: go test -race ./...
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Cliente
+        run: node --test cliente/index.test.js
+      - name: Tipos del cliente
+        run: npx --yes -p typescript@5.9.3 tsc --noEmit --strict --target es2022 --module commonjs cliente/prueba-tipos.ts
+      - name: Imagen
+        run: docker build -t mensajero:ci .

@@ -12,8 +12,8 @@ import (
 
 func TestGenerar(t *testing.T) {
 	cat, err := plantillas.Cargar(fstest.MapFS{
-		"p/gas/base.html":       {Data: []byte(`{{template "contenido" .}}`)},
-		"p/gas/hola/asunto.txt": {Data: []byte("{{.nombre}}")},
+		"p/gas/base.html":        {Data: []byte(`{{template "contenido" .}}`)},
+		"p/gas/hola/asunto.txt":  {Data: []byte("{{.nombre}}")},
 		"p/gas/hola/cuerpo.html": {Data: []byte(`{{define "contenido"}}{{.link}}{{end}}`)},
 	}, "p")
 	if err != nil {
