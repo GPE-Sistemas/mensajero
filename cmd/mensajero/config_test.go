@@ -5,7 +5,9 @@ import (
 	"encoding/hex"
 	"io"
 	"log/slog"
+	"strings"
 	"testing"
+	"time"
 )
 
 func env(m map[string]string) func(string) string { return func(k string) string { return m[k] } }
@@ -28,15 +30,31 @@ func TestConfigurar(t *testing.T) {
 		t.Fatal("no cargó las plantillas embebidas")
 	}
 
-	malos := map[string]map[string]string{
-		"sin claves":       {},
-		"sistema sin json": {"CLAVES": `{"agro":"` + hashHex("k") + `"}`},
-		"tope inválido":    {"CLAVES": `{"gas":"` + hashHex("k") + `"}`, "TOPE_POR_DESTINATARIO_HORA": "mucho"},
-		"tope cero":        {"CLAVES": `{"gas":"` + hashHex("k") + `"}`, "TOPE_POR_DESTINATARIO_HORA": "0"},
+	srv, puerto, err = configurar(env(map[string]string{
+		"CLAVES": `{"gas":"` + hashHex("k") + `"}`, "SMTP_ADDR": "x:25", "PUERTO": "9090", "TOPE_POR_DESTINATARIO_HORA": "5",
+	}), log)
+	if err != nil {
+		t.Fatal(err)
 	}
-	for nombre, e := range malos {
-		if _, _, err := configurar(env(e), log); err == nil {
+	if srv.SMTP.Addr != "x:25" || puerto != "9090" || srv.SMTP.Timeout != 10*time.Second {
+		t.Fatalf("overrides: smtp = %q, puerto = %q, timeout = %v", srv.SMTP.Addr, puerto, srv.SMTP.Timeout)
+	}
+
+	malos := map[string]struct {
+		env map[string]string
+		msg string
+	}{
+		"sin claves":       {map[string]string{}, "CLAVES"},
+		"sistema sin json": {map[string]string{"CLAVES": `{"agro":"` + hashHex("k") + `"}`}, `"agro"`},
+		"tope inválido":    {map[string]string{"CLAVES": `{"gas":"` + hashHex("k") + `"}`, "TOPE_POR_DESTINATARIO_HORA": "mucho"}, "TOPE_POR_DESTINATARIO_HORA"},
+		"tope cero":        {map[string]string{"CLAVES": `{"gas":"` + hashHex("k") + `"}`, "TOPE_POR_DESTINATARIO_HORA": "0"}, "TOPE_POR_DESTINATARIO_HORA"},
+	}
+	for nombre, c := range malos {
+		_, _, err := configurar(env(c.env), log)
+		if err == nil {
 			t.Errorf("%s: configuró", nombre)
+		} else if !strings.Contains(err.Error(), c.msg) {
+			t.Errorf("%s: error %q no contiene %q", nombre, err, c.msg)
 		}
 	}
 }

@@ -44,17 +44,23 @@ func correr(log *slog.Logger) error {
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
+	apagado := make(chan struct{})
 	go func() {
+		defer close(apagado)
 		<-ctx.Done()
 		apagar, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
-		hs.Shutdown(apagar) // deja terminar los envíos en curso
+		// deja terminar los envíos en curso
+		if err := hs.Shutdown(apagar); err != nil {
+			log.Error("apagado incompleto", "error", err.Error())
+		}
 	}()
 
 	log.Info("escuchando", "puerto", puerto, "plantillas", len(srv.Catalogo.Todas()), "smtp", srv.SMTP.Addr)
 	if err := hs.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
+	<-apagado // ListenAndServe vuelve apenas arranca Shutdown; esperar a que termine de drenar
 	return nil
 }
 
