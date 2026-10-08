@@ -1,0 +1,7 @@
+{{define "contenido"}}
+<h1 style="margin:0 0 16px;font-size:20px;">Ya tenés usuario en INSIDE Horatech</h1>
+<p style="margin:0 0 16px;">Tu usuario es <strong>{{.usuario}}</strong>. Para entrar, elegí tu contraseña con este botón:</p>
+<p style="margin:24px 0;text-align:center;"><a href="{{.link}}" style="display:inline-block;background:#06accc;color:#183465;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:bold;">Definir mi contraseña</a></p>
+<p style="margin:0 0 16px;">El enlace vence en 72 horas y sirve una sola vez. Si vence, pedí uno nuevo con "Olvidé mi contraseña".</p>
+<p style="margin:0;font-size:13px;color:#6b7280;">Si el botón no funciona, copiá este enlace en el navegador:<br><a href="{{.link}}" style="color:#183465;word-break:break-all;">{{.link}}</a></p>
+{{end}}

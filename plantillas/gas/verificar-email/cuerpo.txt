@@ -1,0 +1,10 @@
+Confirmá tu mail
+
+Pidieron usar esta dirección para el usuario {{.usuario}}. Para confirmarla, entrá a:
+
+{{.link}}
+
+El enlace vence en 24 horas. Si no fuiste vos, ignorá este mensaje: no cambia nada.
+
+--
+INSIDE Horatech · Mensaje automático, no lo respondas.

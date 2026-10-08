@@ -5,6 +5,10 @@ const m = new Mensajero<'gas'>({ url: 'http://x', apikey: 'k' });
 export async function prueba(): Promise<void> {
   await m.enviar('reset-password', { para: 'a@x.com', datos: { link: 'l' } });
   await m.enviar('scada-reestablecido', { para: 'a@x.com', remitente: 'alertas', nombre: 'Camuzzi', datos: { fecha: '', punto: '', valor: '', variable: '' } });
+  await m.enviar('definir-clave', { para: 'a@x.com', nombre: 'Camuzzi', datos: { usuario: 'ana', link: 'l' } });
+  await m.enviar('verificar-email', { para: 'a@x.com', datos: { usuario: 'ana', link: 'l' } });
+  // @ts-expect-error a verificar-email le falta el usuario
+  await m.enviar('verificar-email', { para: 'a@x.com', datos: { link: 'l' } });
   // @ts-expect-error plantilla inexistente
   await m.enviar('no-existe', { para: 'a@x.com', datos: {} });
   // @ts-expect-error falta link

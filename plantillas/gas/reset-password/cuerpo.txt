@@ -4,7 +4,7 @@ Recibimos un pedido para cambiar la contraseña de tu cuenta. Para elegir una nu
 
 {{.link}}
 
-El enlace vence en 10 minutos. Si no pediste el cambio, ignorá este mensaje: tu contraseña sigue siendo la misma.
+El enlace vence en 1 hora y sirve una sola vez. Si no pediste el cambio, ignorá este mensaje: tu contraseña sigue siendo la misma.
 
 --
 INSIDE Horatech · Mensaje automático, no lo respondas.
