@@ -20,6 +20,7 @@ import (
 )
 
 type entorno struct {
+	s    *Servidor
 	h    http.Handler
 	smtp *smtpfalso.Servidor
 	log  *bytes.Buffer
@@ -52,7 +53,7 @@ func nuevo(t *testing.T) entorno {
 		SMTP:     envio.SMTP{Addr: smtp.Addr, Timeout: 5 * time.Second},
 		Log:      slog.New(slog.NewJSONHandler(&log, nil)),
 	}
-	return entorno{h: s.Handler(), smtp: smtp, log: &log}
+	return entorno{s: s, h: s.Handler(), smtp: smtp, log: &log}
 }
 
 func (e entorno) pedir(apikey, cuerpo string) *httptest.ResponseRecorder {
@@ -197,5 +198,21 @@ func TestDireccionNoASCII(t *testing.T) {
 	w := e.pedir("clave-gas", `{"plantilla":"reset","para":"josé@x.com","datos":{"link":"l"}}`)
 	if w.Code != 400 {
 		t.Fatalf("%d %s", w.Code, w.Body)
+	}
+}
+
+func TestDominiosPermitidos(t *testing.T) {
+	e := nuevo(t)
+	e.s.Dominios = map[string]bool{"x.com": true}
+	if w := e.pedir("clave-gas", `{"plantilla":"reset","para":"a@X.com","datos":{"link":"l"}}`); w.Code != 200 {
+		t.Fatalf("dominio permitido: %d %s", w.Code, w.Body)
+	}
+	for _, para := range []string{"a@cliente.com", "a@sub.x.com"} {
+		if w := e.pedir("clave-gas", `{"plantilla":"reset","para":"`+para+`","datos":{"link":"l"}}`); w.Code != 403 {
+			t.Errorf("%s: %d %s", para, w.Code, w.Body)
+		}
+	}
+	if n := len(e.smtp.Recibidos()); n != 1 {
+		t.Fatalf("salieron %d mails, se esperaba 1", n)
 	}
 }

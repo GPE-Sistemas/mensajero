@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/GPE-Sistemas/mensajero"
@@ -47,6 +48,15 @@ func configurar(getenv func(string) string, log *slog.Logger) (*httpapi.Servidor
 	if err != nil || tope < 1 {
 		return nil, "", fmt.Errorf("TOPE_POR_DESTINATARIO_HORA tiene que ser un entero mayor a 0")
 	}
+	var dominios map[string]bool
+	for _, d := range strings.Split(getenv("DOMINIOS_PERMITIDOS"), ",") {
+		if d = strings.ToLower(strings.TrimSpace(d)); d != "" {
+			if dominios == nil {
+				dominios = map[string]bool{}
+			}
+			dominios[d] = true
+		}
+	}
 	return &httpapi.Servidor{
 		Catalogo: cat,
 		Sistemas: sis,
@@ -54,5 +64,6 @@ func configurar(getenv func(string) string, log *slog.Logger) (*httpapi.Servidor
 		Limite:   limite.Nuevo(tope, time.Hour),
 		SMTP:     envio.SMTP{Addr: porDefecto("SMTP_ADDR", "postfix.mail.svc.cluster.local:587"), Timeout: 10 * time.Second},
 		Log:      log,
+		Dominios: dominios,
 	}, porDefecto("PUERTO", "8080"), nil
 }

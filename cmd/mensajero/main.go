@@ -9,9 +9,11 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"maps"
 	"net/http"
 	"os"
 	"os/signal"
+	"slices"
 	"strings"
 	"syscall"
 	"time"
@@ -56,7 +58,7 @@ func correr(log *slog.Logger) error {
 		}
 	}()
 
-	log.Info("escuchando", "puerto", puerto, "plantillas", len(srv.Catalogo.Todas()), "smtp", srv.SMTP.Addr)
+	log.Info("escuchando", "puerto", puerto, "plantillas", len(srv.Catalogo.Todas()), "smtp", srv.SMTP.Addr, "dominios", slices.Sorted(maps.Keys(srv.Dominios)))
 	if err := hs.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
