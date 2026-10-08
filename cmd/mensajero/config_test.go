@@ -39,6 +39,19 @@ func TestConfigurar(t *testing.T) {
 	if srv.SMTP.Addr != "x:25" || puerto != "9090" || srv.SMTP.Timeout != 10*time.Second {
 		t.Fatalf("overrides: smtp = %q, puerto = %q, timeout = %v", srv.SMTP.Addr, puerto, srv.SMTP.Timeout)
 	}
+	if srv.Dominios != nil {
+		t.Fatalf("sin DOMINIOS_PERMITIDOS tiene que mandar a todos: %v", srv.Dominios)
+	}
+
+	srv, _, err = configurar(env(map[string]string{
+		"CLAVES": `{"gas":"` + hashHex("k") + `"}`, "DOMINIOS_PERMITIDOS": " GPE.ar, horatech.ar ,",
+	}), log)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(srv.Dominios) != 2 || !srv.Dominios["gpe.ar"] || !srv.Dominios["horatech.ar"] {
+		t.Fatalf("dominios = %v", srv.Dominios)
+	}
 
 	malos := map[string]struct {
 		env map[string]string

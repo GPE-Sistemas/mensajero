@@ -25,6 +25,9 @@ type Servidor struct {
 	Limite   *limite.Limite
 	SMTP     envio.SMTP
 	Log      *slog.Logger
+	// Dominios, si no es nil, son los únicos dominios a los que se manda (en test, para no
+	// escribirle a clientes reales desde una base de prueba).
+	Dominios map[string]bool
 }
 
 type pedido struct {
@@ -71,6 +74,10 @@ func (s *Servidor) email(w http.ResponseWriter, r *http.Request) {
 	para, err := direccion(p.Para)
 	if err != nil {
 		s.rechazar(w, http.StatusBadRequest, sistema, p.Plantilla, "", "para: "+err.Error())
+		return
+	}
+	if _, dominio, _ := strings.Cut(para, "@"); s.Dominios != nil && !s.Dominios[strings.ToLower(dominio)] {
+		s.rechazar(w, http.StatusForbidden, sistema, p.Plantilla, para, "el dominio "+dominio+" no está en DOMINIOS_PERMITIDOS")
 		return
 	}
 	responderA := ""
