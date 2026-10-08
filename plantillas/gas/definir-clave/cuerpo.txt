@@ -1,0 +1,10 @@
+Ya tenés usuario en INSIDE Horatech
+
+Tu usuario es {{.usuario}}. Para entrar, elegí tu contraseña en:
+
+{{.link}}
+
+El enlace vence en 72 horas y sirve una sola vez. Si vence, pedí uno nuevo con "Olvidé mi contraseña".
+
+--
+INSIDE Horatech · Mensaje automático, no lo respondas.
