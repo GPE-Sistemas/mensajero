@@ -19,11 +19,11 @@ func TestGenerar(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	sis, _ := sistemas.Cargar(strings.NewReader(`{"gas":{"remitentes":{"default":"a@gpe.ar","alertas":"b@gpe.ar"}}}`))
+	sis, _ := sistemas.Cargar(strings.NewReader(`{"gas":{"remitentes":{"default":"a@gpe.ar","alertas":"b@gpe.ar"}},"nuevo":{"remitentes":{"default":"c@gpe.ar"}}}`))
 	got := string(generar(cat, sis))
 	for _, want := range []string{
-		"export interface Plantillas {\n  'gas': {\n    'hola': { link: string; nombre: string };\n  };\n}",
-		"export interface Remitentes {\n  'gas': 'alertas' | 'default';\n}",
+		"export interface Plantillas {\n  'gas': {\n    'hola': { link: string; nombre: string };\n  };\n  'nuevo': {\n  };\n}",
+		"export interface Remitentes {\n  'gas': 'alertas' | 'default';\n  'nuevo': 'default';\n}",
 	} {
 		if !strings.Contains(got, want) {
 			t.Errorf("falta:\n%s\nen:\n%s", want, got)

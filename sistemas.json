@@ -4,5 +4,10 @@
       "default": "no-reply@horatech.ar",
       "alertas": "alertas@horatech.ar"
     }
+  },
+  "gestion": {
+    "remitentes": {
+      "default": "no-reply@gpe.ar"
+    }
   }
 }
