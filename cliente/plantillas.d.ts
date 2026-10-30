@@ -11,6 +11,7 @@ export interface Plantillas {
     'verificar-email': { link: string; usuario: string };
   };
   'gestion': {
+    'reset-password': { reset_password_url: string; usuario: string };
   };
 }
 

@@ -1,0 +1,10 @@
+Restablecé tu contraseña
+
+Hola, {{.usuario}}. Recibimos un pedido para cambiar la contraseña de tu cuenta. Para elegir una nueva, entrá a:
+
+{{.reset_password_url}}
+
+El enlace vence en 1 hora y sirve una sola vez. Si no pediste el cambio, ignorá este mensaje: tu contraseña sigue siendo la misma.
+
+--
+IRIX · GPE Sistemas · Mensaje automático, no lo respondas.
