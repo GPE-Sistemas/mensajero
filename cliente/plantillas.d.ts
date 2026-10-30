@@ -10,8 +10,11 @@ export interface Plantillas {
     'scada-reestablecido': { fecha: string; punto: string; valor: string; variable: string };
     'verificar-email': { link: string; usuario: string };
   };
+  'gestion': {
+  };
 }
 
 export interface Remitentes {
   'gas': 'alertas' | 'default';
+  'gestion': 'default';
 }

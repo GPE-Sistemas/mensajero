@@ -49,33 +49,31 @@ func generar(cat *plantillas.Catalogo, sis map[string]sistemas.Sistema) []byte {
 	var b bytes.Buffer
 	b.WriteString("// Generado por `make generar` desde plantillas/ y sistemas.json. No editar.\n\n")
 
-	b.WriteString("export interface Plantillas {\n")
-	actual := ""
-	for _, p := range cat.Todas() { // ordenadas por sistema/nombre
-		if p.Sistema != actual {
-			if actual != "" {
-				b.WriteString("  };\n")
-			}
-			fmt.Fprintf(&b, "  '%s': {\n", p.Sistema)
-			actual = p.Sistema
-		}
-		campos := make([]string, len(p.Campos))
-		for i, c := range p.Campos {
-			campos[i] = c + ": string"
-		}
-		fmt.Fprintf(&b, "    '%s': { %s };\n", p.Nombre, strings.Join(campos, "; "))
-	}
-	if actual != "" {
-		b.WriteString("  };\n")
-	}
-	b.WriteString("}\n\n")
-
-	b.WriteString("export interface Remitentes {\n")
 	nombres := make([]string, 0, len(sis))
 	for n := range sis {
 		nombres = append(nombres, n)
 	}
 	sort.Strings(nombres)
+
+	// Todos los sistemas, aunque todavía no tengan plantillas: así Mensajero<'sistema'> compila.
+	b.WriteString("export interface Plantillas {\n")
+	for _, n := range nombres {
+		fmt.Fprintf(&b, "  '%s': {\n", n)
+		for _, p := range cat.Todas() { // ordenadas por sistema/nombre
+			if p.Sistema != n {
+				continue
+			}
+			campos := make([]string, len(p.Campos))
+			for i, c := range p.Campos {
+				campos[i] = c + ": string"
+			}
+			fmt.Fprintf(&b, "    '%s': { %s };\n", p.Nombre, strings.Join(campos, "; "))
+		}
+		b.WriteString("  };\n")
+	}
+	b.WriteString("}\n\n")
+
+	b.WriteString("export interface Remitentes {\n")
 	for _, n := range nombres {
 		var rs []string
 		for r := range sis[n].Remitentes {
