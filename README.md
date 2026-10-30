@@ -6,12 +6,12 @@ por Amazon SES. Diseño: `gas-insideht-doc/docs/superpowers/specs/2026-10-07-men
 
 ## Empezar a usarlo
 
-Sólo desde servicios de cluster-horace (gas, agro): no tiene ingress.
+| | `MENSAJERO_URL` desde cluster-horace (gas, agro) | desde otro cluster (novit) | `MENSAJERO_APIKEY` |
+|---|---|---|---|
+| test | `http://mensajero-test.mail.svc.cluster.local` | `https://mensajero-test.horatech.com.ar` | gas: clave `MENSAJERO_APIKEY` del secreto `gas-twilio-test` |
+| prod | `http://mensajero.mail.svc.cluster.local` | `https://mensajero.horatech.com.ar` | gas: clave `MENSAJERO_APIKEY` del secreto `gas-twilio-prod` |
 
-| | `MENSAJERO_URL` | `MENSAJERO_APIKEY` |
-|---|---|---|
-| test | `http://mensajero-test.mail.svc.cluster.local` | gas: clave `MENSAJERO_APIKEY` del secreto `gas-twilio-test` |
-| prod | `http://mensajero.mail.svc.cluster.local` | gas: clave `MENSAJERO_APIKEY` del secreto `gas-twilio-prod` |
+Desde otro cluster entra por el Ingress, sin whitelist de IP: lo único que lo protege es la apikey.
 
 Para otro servicio de gas, la misma apikey en su secreto de Secret Manager. Para otro sistema, ver
 "Agregar un sistema".
@@ -53,7 +53,9 @@ destinatario), 500 (la plantilla falló: error del mensajero, no del pedido), 50
 1. Su entrada en `sistemas.json` con sus remitentes (sólo `@gpe.ar` o `@horatech.ar`).
 2. Su `base.html` y sus plantillas.
 3. Una apikey: el hash va en el secreto del mensajero (`CLAVES`), la apikey en claro en el del sistema.
-   Ver `cluster-deploy/cluster-horatech/platform/mail/`.
+   Ver `cluster-deploy/cluster-horatech/platform/mail/`. **Recién cuando esté desplegada la versión
+   con el sistema nuevo**: si `CLAVES` trae un sistema que no está en `sistemas.json`, el mensajero
+   no arranca.
 
 ## Correr
 
