@@ -15,7 +15,7 @@ func TestPlantillasReales(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := []string{"gas/cambio-password", "gas/definir-clave", "gas/nuevo-usuario", "gas/reset-password", "gas/scada-fuera-limite", "gas/scada-reestablecido", "gas/verificar-email", "gestion/reset-password"}
+	want := []string{"gas/cambio-password", "gas/definir-clave", "gas/nuevo-usuario", "gas/reset-password", "gas/scada-fuera-limite", "gas/scada-reestablecido", "gas/verificar-email", "gestion/reset-password", "gestion/reset-password-faro"}
 	var got []string
 	for _, p := range cat.Todas() {
 		got = append(got, p.Sistema+"/"+p.Nombre)
