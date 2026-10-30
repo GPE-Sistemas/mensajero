@@ -12,6 +12,7 @@ export interface Plantillas {
   };
   'gestion': {
     'reset-password': { reset_password_url: string; usuario: string };
+    'reset-password-faro': { reset_password_url: string; usuario: string };
   };
 }
 
